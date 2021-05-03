@@ -62,7 +62,7 @@ class CustomTransition(ShaderTransition):
 			    
 			    float move = 0.;
 			    if(direction == 1.0){move = map(t);}
-			    //else{move = map(1.0 - t);}
+			    else{move = map(1.0 - t);}
 			    
 
 			    float proj = dot(uv - origin, dir);
