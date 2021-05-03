@@ -38,6 +38,7 @@ class CustomTransition(ShaderTransition):
 
 			uniform float t;
 			uniform float direction;
+			uniform float aspect;
 			uniform vec2 resolution;
 			uniform sampler2D tex_in;
 			uniform sampler2D tex_out;
@@ -51,7 +52,9 @@ class CustomTransition(ShaderTransition):
 
 			void main( void )
 			{
-			    float aspect = resolution.x / resolution.y ;
+			    float aspect_ratio = 0.0;
+			    if(aspect == 1.0){aspect_ratio = resolution.x / resolution.y;}
+			    else{aspect_ratio = resolution.y / resolution.x; }
 
 			    vec2 uv = gl_FragCoord.xy/resolution.xy;
 			    vec2 dir = vec2(0.2,-1.0);
@@ -59,7 +62,7 @@ class CustomTransition(ShaderTransition):
 			    
 			    float move = 0.;
 			    if(direction == 1.0){move = map(t);}
-			    else{move = map(1.0 - t);}
+			    //else{move = map(1.0 - t);}
 			    
 
 			    float proj = dot(uv - origin, dir);
@@ -71,6 +74,7 @@ class CustomTransition(ShaderTransition):
 			    {
 			        if(direction == 1.0){gl_FragColor = texture2D(tex_in, uv);}
 			        else{gl_FragColor = texture2D(tex_out, uv);}
+
 			        gl_FragColor.rgb *= pow(clamp(dist - radius, 0., 1.) * 1.5, .2);
 			    }
 			    else if (dist >= 0.)
@@ -78,18 +82,22 @@ class CustomTransition(ShaderTransition):
 			        float theta = asin(dist / radius);
 			        vec2 p2 = linePoint + dir * (pi - theta) * radius;
 			        vec2 p1 = linePoint + dir * theta * radius;
-			        uv = (p2.x <= aspect && p2.y <= 1. && p2.x > 0. && p2.y > 0.) ? p2 : p1;
+			        uv = (p2.x <= aspect_ratio && p2.y <= 1. && p2.x > 0. && p2.y > 0.) ? p2 : p1;
+
 			        if(direction == 1.0){gl_FragColor = texture2D(tex_out, uv);}
 			        else{gl_FragColor = texture2D(tex_in, uv);}
+
 			        gl_FragColor.rgb *= pow(clamp((radius - dist) / radius, 0., 1.), .2);
 			    }
 			    else 
 			    {
 			        vec2 p = linePoint + dir * (abs(dist) + pi * radius) ;
-			        uv = (p.x <= aspect && p.y <= 1. && p.x > 0. && p.y > 0.) ? p : uv;
+			        uv = (p.x <= aspect_ratio && p.y <= 1. && p.x > 0. && p.y > 0.) ? p : uv;
+			        
 			        if(direction == 1.0){gl_FragColor = texture2D(tex_out, uv);}
 			        else{gl_FragColor = texture2D(tex_in, uv);}
 			    }
+			    //gl_FragColor = vec4(uv,00,1.0);
 			}
 		"""
 
@@ -100,8 +108,17 @@ class CustomTransition(ShaderTransition):
 		super().add_screen(screen)
 		self.render_ctx["resolution"] = list(map(float, screen.size))
 
+		aspect_ratio = screen.size[0]/screen.size[1]
+		
+		if aspect_ratio >= 1:
+			self.render_ctx["aspect"] = 1.0
+
+		else:
+			self.render_ctx["aspect"] = 2.0
+
 		if self.Direction == "Bottom_to_Top":
 			self.render_ctx["direction"] = 1.0
+		
 		else:
 			self.render_ctx["direction"] = 2.0
 
@@ -109,7 +126,7 @@ class CustomTransition(ShaderTransition):
 class PageCurlApp(MDApp):
 
 	def switch(self,screen):
-		self.kv.ids.screens.transition = CustomTransition(duration=1, Direction="Top_to_Bottom")
+		self.kv.ids.screens.transition = CustomTransition(duration=1, Direction="Bottom_to_Top")
 		self.kv.ids.screens.current = screen
 
 	def build(self):
