@@ -9,7 +9,7 @@ Misc Projects and gists of Kivy and Shaders
       
     ![page curl](https://user-images.githubusercontent.com/45727291/116871008-2e97b000-ac31-11eb-89a6-7034a35350d4.gif)
 
-- [Page Curl Screen Transition](https://github.com/VICTORVICKIE/Kivy_GLSLang/blob/main/Transitions/PageCurl.py)
+- [Slide Over Screen Transition](https://github.com/VICTORVICKIE/Kivy_GLSLang/blob/main/Transitions/SlideOver.py)
 	
      Slide Screen Transition Effect modified from [GL Transition](https://gl-transitions.com/) : [TopBottom Transition](https://github.com/gl-transitions/gl-transitions/blob/master/transitions/TopBottom.glsl
 )
